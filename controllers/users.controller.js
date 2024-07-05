@@ -50,5 +50,31 @@ const addUser = async (req, res) => {
     }
 }
 
+// delete user 
 
-module.exports = { getUsers, addUser };
+const deleteUser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deletedUser = await UsersAuth.findByIdAndDelete({ _id: id })
+        if (deletedUser) {
+            res.status(201).send({
+                success: true,
+                message: "user delete successful",
+                data: deletedUser
+            })
+        } else {
+            res.status(404).send({
+                success: false,
+                message: "delete operation failed"
+            })
+        }
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
+module.exports = { getUsers, addUser, deleteUser };
