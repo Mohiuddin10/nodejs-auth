@@ -1,14 +1,34 @@
 const UsersAuth = require("../models/users.model");
 
-
-const getUsers = (req, res) => {
-    res.send({message: "This will return all users"})
-}
-
-const adduser = (req, res) => {
+// get all users 
+const getUsers = async (req, res) => {
     try {
-        const {email, password} = req.body;
-        const newUser = new UsersAuth({email, password});
+        const users = await UsersAuth.find();
+        console.log(users);
+        if (users) {
+            res.status(201).send({
+                success: true,
+                message: "all users loaded successfully",
+                data: users
+            })
+        } else {
+            res.status(404).send({
+                success: false,
+                message: "users load failed",
+            })
+        }
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: error.message
+        })
+    }
+}
+// add user 
+const addUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const newUser = await new UsersAuth({ email, password });
         newUser.save();
         if (newUser) {
             res.status(201).send({
@@ -25,10 +45,10 @@ const adduser = (req, res) => {
     } catch (error) {
         res.status(500).send({
             success: false,
-            message: "something broken"
+            message: error.message
         })
     }
 }
 
 
-module.exports = {getUsers, adduser};
+module.exports = { getUsers, addUser };
