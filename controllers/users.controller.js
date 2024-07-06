@@ -50,6 +50,40 @@ const addUser = async (req, res) => {
     }
 }
 
+// users match
+
+const loginUser = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        console.log(req.body);
+        let findEmail = await UsersAuth.findOne({email: email});
+        if (findEmail) {
+            if (findEmail.password === password){
+                res.status(201).send({
+                    success: true,
+                    message: "users valid",
+                    data: findEmail
+                })
+            } else {
+                res.status(201).send({
+                    success: false,
+                    message: "invalid users"
+                })
+            }
+        } else{
+            res.status(404).send({
+                success: false,
+                message: "No such user found in Database"
+            })
+        }
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 // delete user 
 
 const deleteUser = async (req, res) => {
@@ -77,4 +111,4 @@ const deleteUser = async (req, res) => {
 }
 
 
-module.exports = { getUsers, addUser, deleteUser };
+module.exports = { getUsers, addUser, deleteUser, loginUser };
