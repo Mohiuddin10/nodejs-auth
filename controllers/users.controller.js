@@ -1,4 +1,5 @@
 const UsersAuth = require("../models/users.model");
+const md5 = require("md5");
 
 // get all users 
 const getUsers = async (req, res) => {
@@ -27,7 +28,8 @@ const getUsers = async (req, res) => {
 // add user 
 const addUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const email = req.body.email;
+        const password = md5(req.body.password)
         const newUser = await new UsersAuth({ email, password });
         newUser.save();
         if (newUser) {
@@ -54,26 +56,23 @@ const addUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const {email, password} = req.body;
+        const email = req.body.email;
+        const password =md5(req.body.password);
         console.log(req.body);
-        let findEmail = await UsersAuth.findOne({email: email});
+        let findEmail = await UsersAuth.findOne({ email: email });
         if (findEmail) {
-            if (findEmail.password === password){
-                res.status(201).send({
-                    success: true,
-                    message: "users valid",
-                    data: findEmail
-                })
-            } else {
-                res.status(201).send({
-                    success: false,
-                    message: "invalid users"
-                })
-            }
-        } else{
-            res.status(404).send({
+            res.status(201).send({
+                success: true,
+                message: "users valid",
+                data: findEmail
+            })
+
+
+
+        } else {
+            res.status(201).send({
                 success: false,
-                message: "No such user found in Database"
+                message: "invalid users"
             })
         }
     } catch (error) {

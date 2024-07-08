@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-var encrypt = require('mongoose-encryption');
+// var encrypt = require('mongoose-encryption');
 
 const user = mongoose.Schema({
     email: {
@@ -18,11 +18,11 @@ const user = mongoose.Schema({
 
 const UsersAuth = mongoose.model("userAuth", user);
 
-UsersAuth.migrateToA(function(err){
-    if (err){ throw err; }
-    console.log('Migration successful');
-});
+// UsersAuth.migrateToA(function(err){
+//     if (err){ throw err; }
+//     console.log('Migration successful');
+// });
 
-var encKey = process.env.ENC_Key
+// var encKey = process.env.ENC_Key
 
 module.exports = UsersAuth;
