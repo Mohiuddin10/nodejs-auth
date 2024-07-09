@@ -1,5 +1,7 @@
 const UsersAuth = require("../models/users.model");
-const md5 = require("md5");
+// const md5 = require("md5");
+const bcrypt = require('bcryptjs');
+const salt = bcrypt.genSaltSync(10);
 
 // get all users 
 const getUsers = async (req, res) => {
@@ -29,7 +31,9 @@ const getUsers = async (req, res) => {
 const addUser = async (req, res) => {
     try {
         const email = req.body.email;
-        const password = md5(req.body.password)
+
+        const hash = bcrypt.hashSync(req.body.password, salt);
+        const password = hash;
         const newUser = await new UsersAuth({ email, password });
         newUser.save();
         if (newUser) {
@@ -55,32 +59,54 @@ const addUser = async (req, res) => {
 // users match
 
 const loginUser = async (req, res) => {
+
     try {
         const email = req.body.email;
-        const password =md5(req.body.password);
-        console.log(req.body);
-        let findEmail = await UsersAuth.findOne({ email: email });
-        if (findEmail) {
-            res.status(201).send({
-                success: true,
-                message: "users valid",
-                data: findEmail
-            })
-
-
-
-        } else {
-            res.status(201).send({
-                success: false,
-                message: "invalid users"
-            })
-        }
+        const password = req.body.password;
+        const findUser = await UsersAuth.findOne({email});
+        bcrypt.compare(password, findUser.password, function(err, match) {
+            if (match) {
+                return res.send({
+                    success: true,
+                    message: "Valid user",
+                    data: findUser
+                })
+            } else {
+                return res.status(404).send({
+                    success: false,
+                    message: "invalid user"})
+            }
+        });
     } catch (error) {
-        res.status(500).send({
-            success: false,
-            message: error.message
-        })
+        
     }
+
+    // try {
+    //     const email = req.body.email;
+    //     const password = req.body.password;
+    //     console.log(req.body);
+    //     let findEmail = await UsersAuth.findOne({ email: email });
+    //     if (findEmail) {
+    //         bcrypt.compare(password, hash, function (err, res) {
+    //             if (res === true) {
+    //                 res.status(201).send({
+    //                     success: true,
+    //                     message: "users valid",
+    //                     data: findEmail
+    //                 })
+    //             } else {
+    //                 res.status(201).send({
+    //                     success: false,
+    //                     message: "users not valid",
+    //                 })
+    //             }
+    //         });
+    // } catch (error) {
+    //     res.status(500).send({
+    //         success: false,
+    //         message: error.message
+    //     })
+    // }
 }
 
 // delete user 
