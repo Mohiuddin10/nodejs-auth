@@ -1,4 +1,9 @@
+const { hash } = require("bcryptjs");
 const UsersAuth = require("../models/users.model");
+const bcrypt = require('bcryptjs');
+require("dotenv").config();
+
+const saltRounds = 10;
 
 
 const registerUser = (req, res) => {
@@ -10,7 +15,7 @@ const registerUser = (req, res) => {
 const createUser = async (req, res) => {
     try {
         const email = req.body.email;
-        const password = req.body.password;
+        let password = bcrypt.hashSync(req.body.password, saltRounds);;
         let newUser = {email, password}
         console.log(newUser);
         const findUser = await UsersAuth.findOne({email});
@@ -20,7 +25,8 @@ const createUser = async (req, res) => {
             newUser = await new UsersAuth(newUser);
             newUser.save()
             res.send(newUser)
-        
+        // ===> password encryption done 
+        // ====> need to match password in login and user passport local session
          }
          
          
